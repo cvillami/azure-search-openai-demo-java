@@ -18,18 +18,18 @@ import com.microsoft.semantickernel.semanticfunctions.HandlebarsPromptTemplateFa
 import com.microsoft.semantickernel.semanticfunctions.KernelFunctionArguments;
 import com.microsoft.semantickernel.semanticfunctions.KernelFunctionYaml;
 import com.microsoft.semantickernel.services.chatcompletion.ChatCompletionService;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
  * Use Java Semantic Kernel framework with semantic and native functions chaining. It uses an
  * imperative style for AI orchestration through sequentially call semantic kernel functions.
- * InformationFinder.SearchFromQuestion native function and RAG.AnswerQuestion semantic function are called
- * sequentially. Several Azure AI Search retrieval options are available: Text, Vector, Hybrid.
+ * InformationFinder.SearchFromQuestion native function and RAG.AnswerQuestion semantic function are
+ * called sequentially. Several Azure AI Search retrieval options are available: Text, Vector,
+ * Hybrid.
  */
 @Component
 public class JavaSemanticKernelChainsApproach implements RAGApproach<String, RAGResponse> {
@@ -60,17 +60,15 @@ public class JavaSemanticKernelChainsApproach implements RAGApproach<String, RAG
 
         // STEP 1: Retrieve relevant documents using user question. It reuses the
         // AzureAISearchRetriever approach through the AzureAISearchPlugin native function.
-        FunctionResult<List> sources = semanticKernel
-                .getPlugin("InformationFinder")
-                .get("SearchFromQuestion")
-                .invokeAsync(semanticKernel)
-                .withArguments(
-                        KernelFunctionArguments.builder()
-                                .withInput(question)
-                                .build()
-                )
-                .withResultType(List.class)
-                .block();
+        FunctionResult<List> sources =
+                semanticKernel
+                        .getPlugin("InformationFinder")
+                        .get("SearchFromQuestion")
+                        .invokeAsync(semanticKernel)
+                        .withArguments(
+                                KernelFunctionArguments.builder().withInput(question).build())
+                        .withResultType(List.class)
+                        .block();
 
         // STEP 2: Build a SK context with the sources retrieved from the memory store and the user
         // question.
@@ -85,11 +83,12 @@ public class JavaSemanticKernelChainsApproach implements RAGApproach<String, RAG
          * (a.k.a. skill) from the SK skills registry and provide it with the pre-built context.
          * Triggering Open AI to get an answerVariables.
          */
-        FunctionResult<String> answerExecutionContext = semanticKernel
-                .invokeAsync("RAG", "AnswerQuestion")
-                .withArguments(answerVariables)
-                .withResultType(String.class)
-                .block();
+        FunctionResult<String> answerExecutionContext =
+                semanticKernel
+                        .invokeAsync("RAG", "AnswerQuestion")
+                        .withArguments(answerVariables)
+                        .withResultType(String.class)
+                        .block();
 
         return new RAGResponse.Builder()
                 .prompt("Prompt is managed by Semantic Kernel")
@@ -109,8 +108,8 @@ public class JavaSemanticKernelChainsApproach implements RAGApproach<String, RAG
     /**
      * Build semantic kernel context with AnswerQuestion semantic function and
      * InformationFinder.SearchFromQuestion native function. AnswerQuestion is imported from
-     * src/main/resources/semantickernel/Plugins. InformationFinder.SearchFromQuestion is implemented in a
-     * traditional Java class method: AzureAISearchPlugin.searchFromConversation
+     * src/main/resources/semantickernel/Plugins. InformationFinder.SearchFromQuestion is
+     * implemented in a traditional Java class method: AzureAISearchPlugin.searchFromConversation
      */
     private Kernel buildSemanticKernel(RAGOptions options) {
         try {
@@ -120,13 +119,12 @@ public class JavaSemanticKernelChainsApproach implements RAGApproach<String, RAG
                             OpenAIChatCompletion.builder()
                                     .withModelId(gptChatDeploymentModelId)
                                     .withOpenAIAsyncClient(this.openAIAsyncClient)
-                                    .build()
-                    )
+                                    .build())
                     .withPlugin(
                             KernelPluginFactory.createFromObject(
-                                    new AzureAISearchPlugin(this.azureAISearchProxy, this.openAIProxy, options),
-                                    "InformationFinder")
-                    )
+                                    new AzureAISearchPlugin(
+                                            this.azureAISearchProxy, this.openAIProxy, options),
+                                    "InformationFinder"))
                     .withPlugin(
                             KernelPluginFactory.createFromFunctions(
                                     "RAG",
@@ -135,13 +133,11 @@ public class JavaSemanticKernelChainsApproach implements RAGApproach<String, RAG
                                             KernelFunctionYaml.fromPromptYaml(
                                                     EmbeddedResourceLoader.readFile(
                                                             "semantickernel/Plugins/RAG/AnswerQuestion/answerQuestion.prompt.yaml",
-                                                            JavaSemanticKernelChainsChatApproach.class,
-                                                            EmbeddedResourceLoader.ResourceLocation.CLASSPATH_ROOT
-                                                    ),
-                                                    new HandlebarsPromptTemplateFactory())
-                                    )
-                            )
-                    )
+                                                            JavaSemanticKernelChainsChatApproach
+                                                                    .class,
+                                                            EmbeddedResourceLoader.ResourceLocation
+                                                                    .CLASSPATH_ROOT),
+                                                    new HandlebarsPromptTemplateFactory()))))
                     .build();
         } catch (IOException e) {
             // Failed to read plugin yaml, should not happen

@@ -8,12 +8,11 @@ import com.azure.ai.openai.models.ChatRequestUserMessage;
 import com.azure.ai.openai.models.ChatRole;
 import com.microsoft.semantickernel.services.chatcompletion.ChatHistory;
 import com.microsoft.semantickernel.services.chatcompletion.message.ChatMessageTextContent;
-
 import java.util.List;
 
 /**
- * Simple class to represent the chat history.
- * It also has utility methods to convert the chat history to OpenAI chat messages.
+ * Simple class to represent the chat history. It also has utility methods to convert the chat
+ * history to OpenAI chat messages.
  */
 public class ChatGPTConversation {
 
@@ -24,21 +23,26 @@ public class ChatGPTConversation {
     }
 
     public ChatHistory toSKChatHistory() {
-        List<ChatMessageTextContent> chatHistory = messages.stream()
-                .map(message -> {
-                    ChatRole role = ChatRole.fromString(message.role().toString());
+        List<ChatMessageTextContent> chatHistory =
+                messages.stream()
+                        .map(
+                                message -> {
+                                    ChatRole role = ChatRole.fromString(message.role().toString());
 
-                    if (role.equals(ChatRole.USER)) {
-                        return ChatMessageTextContent.userMessage(message.content());
-                    } else if (role.equals(ChatRole.ASSISTANT)) {
-                        return ChatMessageTextContent.assistantMessage(message.content());
-                    } else if (role.equals(ChatRole.SYSTEM)) {
-                        return ChatMessageTextContent.systemMessage(message.content());
-                    }
+                                    if (role.equals(ChatRole.USER)) {
+                                        return ChatMessageTextContent.userMessage(
+                                                message.content());
+                                    } else if (role.equals(ChatRole.ASSISTANT)) {
+                                        return ChatMessageTextContent.assistantMessage(
+                                                message.content());
+                                    } else if (role.equals(ChatRole.SYSTEM)) {
+                                        return ChatMessageTextContent.systemMessage(
+                                                message.content());
+                                    }
 
-                    throw new IllegalArgumentException("Unknown chat type");
-                })
-                .toList();
+                                    throw new IllegalArgumentException("Unknown chat type");
+                                })
+                        .toList();
 
         return new ChatHistory(chatHistory);
     }
@@ -47,9 +51,7 @@ public class ChatGPTConversation {
         return this.messages.stream()
                 .map(
                         message -> {
-
-                            ChatRole role = ChatRole.fromString(
-                                    message.role().toString());
+                            ChatRole role = ChatRole.fromString(message.role().toString());
                             ChatRequestMessage chatMessage = null;
 
                             if (role.equals(ChatRole.USER)) {

@@ -19,7 +19,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- *  Controller providing the api to stream the page content from documents stored in Azure Blob Storage.
+ * Controller providing the api to stream the page content from documents stored in Azure Blob
+ * Storage.
  */
 @RestController
 public class ContentController {

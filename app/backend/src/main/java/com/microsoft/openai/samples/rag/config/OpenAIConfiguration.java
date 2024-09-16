@@ -4,7 +4,6 @@ package com.microsoft.openai.samples.rag.config;
 import com.azure.ai.openai.OpenAIAsyncClient;
 import com.azure.ai.openai.OpenAIClient;
 import com.azure.ai.openai.OpenAIClientBuilder;
-import com.azure.ai.openai.OpenAIServiceVersion;
 import com.azure.core.credential.TokenCredential;
 import com.azure.core.http.policy.HttpLogDetailLevel;
 import com.azure.core.http.policy.HttpLogOptions;
@@ -14,8 +13,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- *  Open AI client configuration. If openai.tracing.enabled is true in springboot application.properties file,
- *  Open AI requests and response are written to the log.
+ * Open AI client configuration. If openai.tracing.enabled is true in springboot
+ * application.properties file, Open AI requests and response are written to the log.
  */
 @Configuration
 public class OpenAIConfiguration {

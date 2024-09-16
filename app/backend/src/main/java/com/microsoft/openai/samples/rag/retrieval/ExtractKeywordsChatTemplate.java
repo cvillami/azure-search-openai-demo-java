@@ -5,7 +5,6 @@ import com.azure.ai.openai.models.ChatRequestMessage;
 import com.azure.ai.openai.models.ChatRequestUserMessage;
 import com.microsoft.openai.samples.rag.common.ChatGPTConversation;
 import com.microsoft.openai.samples.rag.common.ChatGPTUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +31,9 @@ public class ExtractKeywordsChatTemplate {
 
         String chatHistory = ChatGPTUtils.formatAsChatML(conversation.toOpenAIChatMessages());
         // Add user message
-        ChatRequestUserMessage chatUserMessage = new ChatRequestUserMessage(EXTRACT_KEYWORDS_USER_PROMPT_TEMPLATE.formatted(chatHistory));
+        ChatRequestUserMessage chatUserMessage =
+                new ChatRequestUserMessage(
+                        EXTRACT_KEYWORDS_USER_PROMPT_TEMPLATE.formatted(chatHistory));
 
         this.conversationHistory.add(chatUserMessage);
 

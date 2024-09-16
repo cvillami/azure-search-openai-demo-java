@@ -19,13 +19,12 @@ import com.microsoft.openai.samples.rag.common.ChatGPTConversation;
 import com.microsoft.openai.samples.rag.common.ChatGPTUtils;
 import com.microsoft.openai.samples.rag.proxy.AzureAISearchProxy;
 import com.microsoft.openai.samples.rag.proxy.OpenAIProxy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * Cognitive Search retriever implementation that uses the Cognitive Search API to retrieve
@@ -39,8 +38,7 @@ public class AzureAISearchRetriever implements Retriever {
     private final AzureAISearchProxy azureAISearchProxy;
     private final OpenAIProxy openAIProxy;
 
-    public AzureAISearchRetriever(
-            AzureAISearchProxy azureAISearchProxy, OpenAIProxy openAIProxy) {
+    public AzureAISearchRetriever(AzureAISearchProxy azureAISearchProxy, OpenAIProxy openAIProxy) {
         this.azureAISearchProxy = azureAISearchProxy;
         this.openAIProxy = openAIProxy;
     }
@@ -56,7 +54,8 @@ public class AzureAISearchRetriever implements Retriever {
         String searchText = null;
 
         // If the retrieval mode is set to vectors or hybrid, convert the user's query text to an
-        // embeddings vector. The embeddings vector is passed as search options to Azure AI Search index
+        // embeddings vector. The embeddings vector is passed as search options to Azure AI Search
+        // index
         if (ragOptions.getRetrievalMode() == RetrievalMode.vectors
                 || ragOptions.getRetrievalMode() == RetrievalMode.hybrid) {
             LOGGER.info(
@@ -65,8 +64,7 @@ public class AzureAISearchRetriever implements Retriever {
                     question);
 
             Embeddings response = openAIProxy.getEmbeddings(List.of(question));
-            var questionVector =
-                    response.getData().get(0).getEmbedding();
+            var questionVector = response.getData().get(0).getEmbedding();
             if (ragOptions.getRetrievalMode() == RetrievalMode.vectors) {
                 setSearchOptionsForVector(ragOptions, questionVector, searchOptions);
             } else {
@@ -87,7 +85,7 @@ public class AzureAISearchRetriever implements Retriever {
      * @param conversation
      * @param ragOptions
      * @return facts retrieved from the search index based on GPT optimized search keywords
-     * extracted from the chat history
+     *     extracted from the chat history
      */
     @Override
     public List<ContentSource> retrieveFromConversation(

@@ -1,3 +1,4 @@
+// Copyright (c) Microsoft. All rights reserved.
 package com.microsoft.openai.samples.rag.approaches;
 
 import com.microsoft.openai.samples.rag.ask.approaches.PlainJavaAskApproach;
@@ -9,7 +10,8 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RAGApproachFactorySpringBootImpl implements RAGApproachFactory, ApplicationContextAware {
+public class RAGApproachFactorySpringBootImpl
+        implements RAGApproachFactory, ApplicationContextAware {
 
     private static final String JAVA_OPENAI_SDK = "jos";
     private static final String JAVA_SEMANTIC_KERNEL = "jsk";
@@ -29,25 +31,28 @@ public class RAGApproachFactorySpringBootImpl implements RAGApproachFactory, App
         if (ragType.equals(RAGType.CHAT)) {
             if (JAVA_OPENAI_SDK.equals(approachName)) {
                 return applicationContext.getBean(PlainJavaChatApproach.class);
-            } else if (
-                    JAVA_SEMANTIC_KERNEL_PLANNER.equals(approachName) &&
-                            ragOptions != null &&
-                            ragOptions.getSemantickKernelMode() != null &&
-                            ragOptions.getSemantickKernelMode() == SemanticKernelMode.chains) {
+            } else if (JAVA_SEMANTIC_KERNEL_PLANNER.equals(approachName)
+                    && ragOptions != null
+                    && ragOptions.getSemantickKernelMode() != null
+                    && ragOptions.getSemantickKernelMode() == SemanticKernelMode.chains) {
                 return applicationContext.getBean(JavaSemanticKernelChainsChatApproach.class);
             }
         } else if (ragType.equals(RAGType.ASK)) {
             if (JAVA_OPENAI_SDK.equals(approachName))
                 return applicationContext.getBean(PlainJavaAskApproach.class);
-            else if (JAVA_SEMANTIC_KERNEL_PLANNER.equals(approachName) && ragOptions != null && ragOptions.getSemantickKernelMode() != null && ragOptions.getSemantickKernelMode() == SemanticKernelMode.chains)
+            else if (JAVA_SEMANTIC_KERNEL_PLANNER.equals(approachName)
+                    && ragOptions != null
+                    && ragOptions.getSemantickKernelMode() != null
+                    && ragOptions.getSemantickKernelMode() == SemanticKernelMode.chains)
                 return applicationContext.getBean(JavaSemanticKernelChainsApproach.class);
         }
-        //if this point is reached then the combination of approach and rag type is not supported
-        throw new IllegalArgumentException("Invalid combination for approach[%s] and rag type[%s]: ".formatted(approachName, ragType));
+        // if this point is reached then the combination of approach and rag type is not supported
+        throw new IllegalArgumentException(
+                "Invalid combination for approach[%s] and rag type[%s]: "
+                        .formatted(approachName, ragType));
     }
 
     public void setApplicationContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
-
 }

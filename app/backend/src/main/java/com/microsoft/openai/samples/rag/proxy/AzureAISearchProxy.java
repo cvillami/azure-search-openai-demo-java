@@ -8,11 +8,9 @@ import com.azure.search.documents.util.SearchPagedIterable;
 import org.springframework.stereotype.Component;
 
 /**
- * This class is a proxy to the Azure AI Search API. It is responsible for:
- * - calling the OpenAI API
- * - handling errors and retry strategy
- * - add monitoring points
- * - add circuit breaker with exponential backoff
+ * This class is a proxy to the Azure AI Search API. It is responsible for: - calling the OpenAI API
+ * - handling errors and retry strategy - add monitoring points - add circuit breaker with
+ * exponential backoff
  */
 @Component
 public class AzureAISearchProxy {

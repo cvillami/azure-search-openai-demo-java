@@ -6,25 +6,25 @@ import com.azure.ai.openai.models.ChatRequestMessage;
 import com.azure.ai.openai.models.ChatRequestSystemMessage;
 import com.azure.ai.openai.models.ChatRequestUserMessage;
 import com.microsoft.openai.samples.rag.approaches.ContentSource;
-
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This class represents a prompt for a one shot generate response request.
- * It uses a naive templating system based on simple java string formatting.
- * The prompt is built by injecting the domain specific sources and the user question into the prompt template. Specifically
- *  1. System prompt has instructions for the assistant.
- *  2. Few shot examples are added as user/assistant messages in the messages list (not in the system prompt).
- *  3. User question is grounded with the domain specific sources and added as last message.
- * It doesn't account for the whole conversation history, only the last user message is used. See @AnswerQuestionChatPromptTemplate for an example that uses the whole conversation history.
- * It doesn't account for the maximum token limit of the OpenAI API.
+ * This class represents a prompt for a one shot generate response request. It uses a naive
+ * templating system based on simple java string formatting. The prompt is built by injecting the
+ * domain specific sources and the user question into the prompt template. Specifically 1. System
+ * prompt has instructions for the assistant. 2. Few shot examples are added as user/assistant
+ * messages in the messages list (not in the system prompt). 3. User question is grounded with the
+ * domain specific sources and added as last message. It doesn't account for the whole conversation
+ * history, only the last user message is used. See @AnswerQuestionChatPromptTemplate for an example
+ * that uses the whole conversation history. It doesn't account for the maximum token limit of the
+ * OpenAI API.
  */
 public class AnswerQuestionPromptTemplate {
 
     private final List<ChatRequestMessage> messages = new ArrayList<>();
     private String customPrompt = "";
-    final private String systemMessage;
+    private final String systemMessage;
     private Boolean replacePrompt = false;
     private List<ContentSource> sources;
 
@@ -68,7 +68,8 @@ public class AnswerQuestionPromptTemplate {
     %s
     """;
 
-    public AnswerQuestionPromptTemplate(String customPrompt, Boolean replacePrompt, List<ContentSource> sources) {
+    public AnswerQuestionPromptTemplate(
+            String customPrompt, Boolean replacePrompt, List<ContentSource> sources) {
 
         if (replacePrompt && (customPrompt == null || customPrompt.isEmpty()))
             throw new IllegalStateException(
@@ -81,10 +82,10 @@ public class AnswerQuestionPromptTemplate {
         this.customPrompt = customPrompt == null ? "" : customPrompt;
 
         if (this.replacePrompt) {
-           //custom prompt is used to replace the whole system message
+            // custom prompt is used to replace the whole system message
             this.systemMessage = customPrompt;
         } else {
-           //custom prompt is used to extend the internal system message
+            // custom prompt is used to extend the internal system message
             this.systemMessage = SYSTEM_CHAT_MESSAGE_TEMPLATE.formatted(this.customPrompt);
         }
 
@@ -98,12 +99,14 @@ public class AnswerQuestionPromptTemplate {
         ChatRequestMessage fewShotUserMessage = new ChatRequestUserMessage(FEW_SHOT_USER_MESSAGE);
         this.messages.add(fewShotUserMessage);
 
-        ChatRequestMessage fewShotAssistantMessage = new ChatRequestAssistantMessage(FEW_SHOT_ASSISTANT_MESSAGE);
+        ChatRequestMessage fewShotAssistantMessage =
+                new ChatRequestAssistantMessage(FEW_SHOT_ASSISTANT_MESSAGE);
         this.messages.add(fewShotAssistantMessage);
     }
 
     /**
      * Get the grounded messages
+     *
      * @param question
      * @return
      */

@@ -24,9 +24,9 @@ import org.springframework.stereotype.Component;
 /**
  * Use Azure AI Search and Java OpenAI APIs. It first retrieves top documents from search and use
  * them to build a prompt. Then, it uses OpenAI to generate an answer for the user question. Several
- * azure search retrieval options are available: Text, Vector, Hybrid. When Hybrid and Vector
- * are selected an additional call to OpenAI is required to generate embeddings vector for the
- * user question.
+ * azure search retrieval options are available: Text, Vector, Hybrid. When Hybrid and Vector are
+ * selected an additional call to OpenAI is required to generate embeddings vector for the user
+ * question.
  */
 @Component
 public class PlainJavaAskApproach implements RAGApproach<String, RAGResponse> {
@@ -73,9 +73,10 @@ public class PlainJavaAskApproach implements RAGApproach<String, RAGResponse> {
             customPrompt = customPrompt.substring(1);
         }
 
-        // STEP 2: Build a prompt using RAG options to see if prompt should be replaced or extended. This is still not grounded with relevant facts
+        // STEP 2: Build a prompt using RAG options to see if prompt should be replaced or extended.
+        // This is still not grounded with relevant facts
         var answerQuestionChatTemplate =
-                new AnswerQuestionPromptTemplate(customPrompt, replacePrompt,sources);
+                new AnswerQuestionPromptTemplate(customPrompt, replacePrompt, sources);
 
         // STEP 3: Build the chat conversation with grounded messages using the retrieved facts
         var groundedChatMessages = answerQuestionChatTemplate.getMessages(question);
@@ -101,7 +102,9 @@ public class PlainJavaAskApproach implements RAGApproach<String, RAGResponse> {
     }
 
     /**
-     * This is the run streaming version which is implemented as new line delimited json. for more info see https://en.wikipedia.org/wiki/JSON_streaming
+     * This is the run streaming version which is implemented as new line delimited json. for more
+     * info see https://en.wikipedia.org/wiki/JSON_streaming
+     *
      * @param question
      * @param options
      * @param outputStream
@@ -128,7 +131,7 @@ public class PlainJavaAskApproach implements RAGApproach<String, RAGResponse> {
         }
 
         var answerQuestionChatTemplate =
-                new AnswerQuestionPromptTemplate(customPrompt, replacePrompt,sources);
+                new AnswerQuestionPromptTemplate(customPrompt, replacePrompt, sources);
 
         var groundedChatMessages = answerQuestionChatTemplate.getMessages(question);
         var chatCompletionsOptions =
@@ -139,7 +142,8 @@ public class PlainJavaAskApproach implements RAGApproach<String, RAGResponse> {
         int index = 0;
 
         /**
-         * For each chat message, generate a response and write it to the output stream provided by the caller.
+         * For each chat message, generate a response and write it to the output stream provided by
+         * the caller.
          */
         for (ChatCompletions completion : completions) {
 

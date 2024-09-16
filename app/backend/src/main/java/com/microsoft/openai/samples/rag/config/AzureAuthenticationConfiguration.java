@@ -11,10 +11,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 /**
- *  The following Azure authentication providers are used in the application:
- *  - Local development: Azure CLI
- *  - Local Docker: AZURE_TENANT_ID, AZURE_CLIENT_ID, AZURE_CLIENT SECRET env variables are used with Environment credential builder.
- *  - Azure: Managed Identity
+ * The following Azure authentication providers are used in the application: - Local development:
+ * Azure CLI - Local Docker: AZURE_TENANT_ID, AZURE_CLIENT_ID, AZURE_CLIENT SECRET env variables are
+ * used with Environment credential builder. - Azure: Managed Identity
  */
 @Configuration
 public class AzureAuthenticationConfiguration {
@@ -39,8 +38,6 @@ public class AzureAuthenticationConfiguration {
     public TokenCredential managedIdentityTokenCredential() {
         if (this.clientId.equals("system-managed-identity"))
             return new ManagedIdentityCredentialBuilder().build();
-        else
-            return new ManagedIdentityCredentialBuilder().clientId(this.clientId).build();
-
+        else return new ManagedIdentityCredentialBuilder().clientId(this.clientId).build();
     }
 }

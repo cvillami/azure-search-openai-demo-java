@@ -10,11 +10,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * This class is a proxy to the Blob storage client. It is responsible for:
- * - calling the API
- * - handling errors and retry strategy
- * - add monitoring points
- * - add circuit breaker with exponential backoff
+ * This class is a proxy to the Blob storage client. It is responsible for: - calling the API -
+ * handling errors and retry strategy - add monitoring points - add circuit breaker with exponential
+ * backoff
  */
 @Component
 public class BlobStorageProxy {

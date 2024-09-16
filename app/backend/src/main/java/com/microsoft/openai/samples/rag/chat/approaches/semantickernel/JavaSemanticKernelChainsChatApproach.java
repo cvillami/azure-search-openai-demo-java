@@ -1,3 +1,4 @@
+// Copyright (c) Microsoft. All rights reserved.
 package com.microsoft.openai.samples.rag.chat.approaches.semantickernel;
 
 import com.azure.ai.openai.OpenAIAsyncClient;
@@ -21,22 +22,23 @@ import com.microsoft.semantickernel.semanticfunctions.KernelFunctionYaml;
 import com.microsoft.semantickernel.services.chatcompletion.ChatCompletionService;
 import com.microsoft.semantickernel.services.chatcompletion.ChatHistory;
 import com.microsoft.semantickernel.services.chatcompletion.ChatMessageContent;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
  * Use Java Semantic Kernel framework with semantic and native functions chaining. It uses an
  * imperative style for AI orchestration through semantic kernel functions chaining.
- * InformationFinder.SearchFromConversation native function and RAG.AnswerConversation semantic function are called
- * sequentially. Several cognitive search retrieval options are available: Text, Vector, Hybrid.
+ * InformationFinder.SearchFromConversation native function and RAG.AnswerConversation semantic
+ * function are called sequentially. Several cognitive search retrieval options are available: Text,
+ * Vector, Hybrid.
  */
 @Component
-public class JavaSemanticKernelChainsChatApproach implements RAGApproach<ChatGPTConversation, RAGResponse> {
+public class JavaSemanticKernelChainsChatApproach
+        implements RAGApproach<ChatGPTConversation, RAGResponse> {
     private final AzureAISearchProxy azureAISearchProxy;
 
     private final OpenAIProxy openAIProxy;
@@ -48,7 +50,10 @@ public class JavaSemanticKernelChainsChatApproach implements RAGApproach<ChatGPT
     @Value("${openai.chatgpt.deployment}")
     private String gptChatDeploymentModelId;
 
-    public JavaSemanticKernelChainsChatApproach(AzureAISearchProxy azureAISearchProxy, OpenAIAsyncClient openAIAsyncClient, OpenAIProxy openAIProxy) {
+    public JavaSemanticKernelChainsChatApproach(
+            AzureAISearchProxy azureAISearchProxy,
+            OpenAIAsyncClient openAIAsyncClient,
+            OpenAIProxy openAIProxy) {
         this.azureAISearchProxy = azureAISearchProxy;
         this.openAIAsyncClient = openAIAsyncClient;
         this.openAIProxy = openAIProxy;
@@ -63,33 +68,37 @@ public class JavaSemanticKernelChainsChatApproach implements RAGApproach<ChatGPT
 
         // STEP 1: Retrieve relevant documents using the current conversation. It reuses the
         // AzureAISearchRetriever approach through the AzureAISearchPlugin native function.
-        FunctionResult<List> searchContext = semanticKernel
-                .invokeAsync("InformationFinder", "SearchFromConversation")
-                .withArguments(
-                        KernelFunctionArguments.builder()
-                                .withVariable("conversation", conversation)
-                                .build())
-                .withResultType(List.class)
-                .block();
+        FunctionResult<List> searchContext =
+                semanticKernel
+                        .invokeAsync("InformationFinder", "SearchFromConversation")
+                        .withArguments(
+                                KernelFunctionArguments.builder()
+                                        .withVariable("conversation", conversation)
+                                        .build())
+                        .withResultType(List.class)
+                        .block();
 
-        // STEP 2: Build a SK context with the sources retrieved from the memory store and conversation
-        KernelFunctionArguments variables = KernelFunctionArguments.builder()
-                .withVariable("sources", searchContext.getResult())
-                .withVariable("conversation", removeLastMessage(conversation))
-                .withVariable("suggestions", options.isSuggestFollowupQuestions())
-                .withVariable("input", question.getContent())
-                .build();
+        // STEP 2: Build a SK context with the sources retrieved from the memory store and
+        // conversation
+        KernelFunctionArguments variables =
+                KernelFunctionArguments.builder()
+                        .withVariable("sources", searchContext.getResult())
+                        .withVariable("conversation", removeLastMessage(conversation))
+                        .withVariable("suggestions", options.isSuggestFollowupQuestions())
+                        .withVariable("input", question.getContent())
+                        .build();
 
         /*
          * STEP 3: Get a reference of the semantic function [AnswerConversation] of the [RAG] plugin
          * (a.k.a. skill) from the SK skills registry and provide it with the pre-built context.
          * Triggering Open AI to get a reply.
          */
-        FunctionResult<String> reply = semanticKernel
-                .invokeAsync("RAG", "AnswerConversation")
-                .withArguments(variables)
-                .withResultType(String.class)
-                .block();
+        FunctionResult<String> reply =
+                semanticKernel
+                        .invokeAsync("RAG", "AnswerConversation")
+                        .withArguments(variables)
+                        .withResultType(String.class)
+                        .block();
 
         return new RAGResponse.Builder()
                 .prompt(renderedConversation)
@@ -117,52 +126,56 @@ public class JavaSemanticKernelChainsChatApproach implements RAGApproach<ChatGPT
     /**
      * Build semantic kernel context with AnswerConversation semantic function and
      * InformationFinder.SearchFromConversation native function. AnswerConversation is imported from
-     * src/main/resources/semantickernel/Plugins. InformationFinder.SearchFromConversation is implemented in a
-     * traditional Java class method: AzureAISearchPlugin.searchFromConversation
+     * src/main/resources/semantickernel/Plugins. InformationFinder.SearchFromConversation is
+     * implemented in a traditional Java class method: AzureAISearchPlugin.searchFromConversation
      *
      * @param options
      * @return
      */
     private Kernel buildSemanticKernel(RAGOptions options) {
-        ChatCompletionService chatCompletion = OpenAIChatCompletion.builder()
-                .withOpenAIAsyncClient(openAIAsyncClient)
-                .withModelId(gptChatDeploymentModelId)
-                .build();
+        ChatCompletionService chatCompletion =
+                OpenAIChatCompletion.builder()
+                        .withOpenAIAsyncClient(openAIAsyncClient)
+                        .withModelId(gptChatDeploymentModelId)
+                        .build();
 
-        KernelPlugin searchPlugin = KernelPluginFactory.createFromObject(
-                new AzureAISearchPlugin(this.azureAISearchProxy, this.openAIProxy, options),
-                "InformationFinder");
+        KernelPlugin searchPlugin =
+                KernelPluginFactory.createFromObject(
+                        new AzureAISearchPlugin(this.azureAISearchProxy, this.openAIProxy, options),
+                        "InformationFinder");
 
         KernelPlugin answerPlugin;
         try {
-            answerPlugin = KernelPluginFactory.createFromFunctions(
-                    "RAG",
-                    "AnswerConversation",
-                    List.of(
-                            KernelFunctionYaml.fromPromptYaml(
-                                    EmbeddedResourceLoader.readFile(
-                                            "semantickernel/Plugins/RAG/AnswerConversation/answerConversation.prompt.yaml",
-                                            JavaSemanticKernelChainsChatApproach.class,
-                                            EmbeddedResourceLoader.ResourceLocation.CLASSPATH_ROOT
-                                    ),
-                                    new HandlebarsPromptTemplateFactory())
-                    )
-            );
+            answerPlugin =
+                    KernelPluginFactory.createFromFunctions(
+                            "RAG",
+                            "AnswerConversation",
+                            List.of(
+                                    KernelFunctionYaml.fromPromptYaml(
+                                            EmbeddedResourceLoader.readFile(
+                                                    "semantickernel/Plugins/RAG/AnswerConversation/answerConversation.prompt.yaml",
+                                                    JavaSemanticKernelChainsChatApproach.class,
+                                                    EmbeddedResourceLoader.ResourceLocation
+                                                            .CLASSPATH_ROOT),
+                                            new HandlebarsPromptTemplateFactory())));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        Kernel kernel = Kernel.builder()
-                .withAIService(ChatCompletionService.class, chatCompletion)
-                .withPlugin(searchPlugin)
-                .withPlugin(answerPlugin)
-                .build();
+        Kernel kernel =
+                Kernel.builder()
+                        .withAIService(ChatCompletionService.class, chatCompletion)
+                        .withPlugin(searchPlugin)
+                        .withPlugin(answerPlugin)
+                        .build();
 
-        kernel.getGlobalKernelHooks().addPreChatCompletionHook(event -> {
-            this.renderedConversation = ChatGPTUtils.formatAsChatML(event.getOptions().getMessages());
-            return event;
-        });
+        kernel.getGlobalKernelHooks()
+                .addPreChatCompletionHook(
+                        event -> {
+                            this.renderedConversation =
+                                    ChatGPTUtils.formatAsChatML(event.getOptions().getMessages());
+                            return event;
+                        });
         return kernel;
     }
-
 }
